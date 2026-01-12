@@ -1,22 +1,22 @@
-import { mockTracks } from "../data/mock";
 import type { PlayerProps } from "../types/PropsTypes.ts";
+import { useQuery } from "@tanstack/react-query";
+import fetchTracks from "../api/trackApi.ts";
 
 export default function Player({
 	selectedPanel,
 	onPanelChange,
-	currentTrackId,
 }: PlayerProps) {
-	const currentTrack = mockTracks.find((track) => track.id === currentTrackId);
 
-	if (!currentTrack) {
-		return (
-			<div>
-				요청하신 트랙 정보를 찾을 수 없습니다.
-				<br />
-				삭제되었거나 주소가 올바르지 않습니다.
-			</div>
-		);
-	}
+	const { data, isLoading, error } = useQuery({
+		queryKey: ["jamendo_tracks"],
+		queryFn: fetchTracks,
+	});
+
+	const currentTrack = data?.[0];
+
+	if(isLoading) return <p>로딩중</p>
+	if(error) return <p>오류 발생: {error.message}</p>
+	if(!currentTrack) return <p>데이터 존재x</p>
 
 	return (
 		<div className="relative mb-10">

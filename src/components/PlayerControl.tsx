@@ -1,21 +1,21 @@
-import { mockTracks } from "../data/mock";
-import type { PlayerControlProps } from "../types/PropsTypes.ts";
+import { useQuery } from "@tanstack/react-query";
+import fetchTracks from "../api/trackApi.ts";
 
-export default function PlayerControl({ currentTrackId }: PlayerControlProps) {
-	const currentTrack = mockTracks.find((track) => track.id === currentTrackId);
+export default function PlayerControl() {
+	const { data, isLoading, error } = useQuery({
+		queryKey: ["jamendo_tracks"],
+		queryFn: fetchTracks,
+	});
 
-	if (!currentTrack) {
-		return (
-			<div>
-				요청하신 트랙 정보를 찾을 수 없습니다.
-				<br />
-				삭제되었거나 주소가 올바르지 않습니다.
-			</div>
-		);
-	}
+	const currentTrack = data?.[0];
+
+	if (isLoading) return <p>로딩중</p>;
+	if (error) return <p>오류 발생: {error.message}</p>;
+	if (!currentTrack) return <p>데이터 존재x</p>;
+
 
 	// 임시 재생 시간
-	const currentTime = 84;
+	const currentTime = currentTrack.duration;
 	const progress = (currentTime / currentTrack.duration) * 100;
 
 	// 초를 분:초 형식으로 변환
