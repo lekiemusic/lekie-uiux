@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import fetchTracks from "../api/trackApi.ts";
+import fetchTracks from "../../api/trackApi.ts";
 
 export default function PlayerControl() {
 	const { data, isLoading, error } = useQuery({

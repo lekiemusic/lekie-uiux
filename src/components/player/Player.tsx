@@ -1,11 +1,10 @@
-import type { PlayerProps } from "../types/PropsTypes.ts";
 import { useQuery } from "@tanstack/react-query";
-import fetchTracks from "../api/trackApi.ts";
+import fetchTracks from "../../api/trackApi.ts";
+import { useTapModal } from "../../store/modalStore.ts";
 
-export default function Player({
-	selectedPanel,
-	onPanelChange,
-}: PlayerProps) {
+export default function Player() {
+	const selectedPanel = useTapModal((state) => state.selectedPanel);
+	const onPanelChange = useTapModal((state) => state.onPanelChange);
 
 	const { data, isLoading, error } = useQuery({
 		queryKey: ["jamendo_tracks"],
@@ -14,9 +13,9 @@ export default function Player({
 
 	const currentTrack = data?.[0];
 
-	if(isLoading) return <p>로딩중</p>
-	if(error) return <p>오류 발생: {error.message}</p>
-	if(!currentTrack) return <p>데이터 존재x</p>
+	if (isLoading) return <p>로딩중</p>;
+	if (error) return <p>오류 발생: {error.message}</p>;
+	if (!currentTrack) return <p>데이터 존재x</p>;
 
 	return (
 		<div className="relative mb-10">
