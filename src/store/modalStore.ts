@@ -22,20 +22,22 @@ export const useTapModal = create(
 	combine(
 		{
 			selectedPanel: -1,
+			isModalExpanded: false,
 		},
 		(set) => ({
-			onPanelChange: (panelIndex: number) =>
-				set({ selectedPanel: panelIndex }),
+			onPanelChange: (panelIndex: number) => set({ selectedPanel: panelIndex }),
 
-			openModal: (type:ModalType) => {
-				if(type === null) {
-					set({selectedPanel: -1});
+			openModal: (type: ModalType) => {
+				if (type === null) {
+					set({ selectedPanel: -1 });
 				} else {
-					set({selectedPanel: MODAL_TYPES[type]})
+					set({ selectedPanel: MODAL_TYPES[type] });
 				}
 			},
 
+			// onModalExpanded: () => set((state) => ({isModalExpanded: !state.isModalExpanded})),
+
+			onClose: () => set({ selectedPanel: -1, isModalExpanded: false }),
 		})
 	)
 );
-

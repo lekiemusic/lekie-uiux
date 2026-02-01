@@ -1,15 +1,11 @@
 import { motion, AnimatePresence } from "motion/react";
 import { X, Search, Music, TrendingUp, LogIn, Grid3x3 } from "lucide-react";
-import { ReactNode } from "react";
+import { type ModalType, useTapModal } from "../../store/modalStore.ts";
+import type { ReactNode } from "react";
 
-
-// interface ModalContainerProps {
-// 	openModal: ModalType;
-// 	isModalExpanded: boolean;
-// 	onClose: () => void;
-// 	onWheel: (e: React.WheelEvent<HTMLDivElement>) => void;
-// 	children: ReactNode;
-// }
+interface ModalContainerProps {
+	children: ReactNode;
+}
 
 const modalConfig = {
 	login: { icon: LogIn, title: "로그인" },
@@ -19,17 +15,30 @@ const modalConfig = {
 	category: { icon: Grid3x3, title: "카테고리" },
 };
 
-export function ModalContainer() {
-	if (!openModal) return null;
+export function ModalContainer({ children }: ModalContainerProps) {
+	const { isModalExpanded, onClose, selectedPanel } = useTapModal();
 
+	const modalKeys = Object.keys(modalConfig) as Array<Exclude<ModalType, null>>;
+	if (selectedPanel === -1) return null;
+
+	const openModal = modalKeys[selectedPanel];
 	const config = modalConfig[openModal];
 	const Icon = config.icon;
+
+	const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+		const target = e.currentTarget;
+		const isAtTop = target.scrollTop === 0;
+
+		if (isAtTop && e.deltaY < 0) {
+			useTapModal.setState({ isModalExpanded: true });
+		}
+	};
 
 	return (
 		<AnimatePresence>
 			{/* Backdrop */}
 			<motion.div
-				className="fixed inset-0 bg-black/60 z-40"
+				className="fixed inset-0 bg-black/60 z-60"
 				initial={{ opacity: 0 }}
 				animate={{ opacity: 1 }}
 				exit={{ opacity: 0 }}
@@ -38,16 +47,15 @@ export function ModalContainer() {
 
 			{/* Modal */}
 			<motion.div
-				className="fixed left-0 right-0 z-50 bg-gradient-to-br from-orange-500 to-amber-600 rounded-t-3xl shadow-2xl overflow-hidden mx-4"
+				className="fixed inset-x-0 bottom-0 z-70 bg-gradient-to-br from-orange-500 to-amber-600 rounded-t-3xl shadow-2xl overflow-hidden mx-4"
 				initial={{ y: "100%" }}
 				animate={{
 					y: 0,
-					bottom: "0%",
 					height: isModalExpanded ? "90vh" : "60vh",
 				}}
 				exit={{ y: "100%" }}
 				transition={{ type: "spring", damping: 30, stiffness: 300 }}
-				onWheel={onWheel}>
+				onWheel={handleWheel}>
 				{/* Drag Handle */}
 				<div className="flex justify-center py-3">
 					<div className="w-12 h-1.5 bg-white/30 rounded-full"></div>

@@ -13,7 +13,6 @@ export default function PlayerControl() {
 	if (error) return <p>오류 발생: {error.message}</p>;
 	if (!currentTrack) return <p>데이터 존재x</p>;
 
-
 	// 임시 재생 시간
 	const currentTime = currentTrack.duration;
 	const progress = (currentTime / currentTrack.duration) * 100;

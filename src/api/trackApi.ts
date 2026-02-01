@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import type {Track} from "../types/ApiDataTypes.ts";
+import type { Track } from "../types/ApiDataTypes.ts";
 
 const supabase = createClient(
 	import.meta.env.VITE_SUPABASE_URL,
@@ -18,4 +18,3 @@ const fetchTracks = async (): Promise<Track[]> => {
 };
 
 export default fetchTracks;
-
