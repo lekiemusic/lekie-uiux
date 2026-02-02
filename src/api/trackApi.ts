@@ -1,10 +1,5 @@
-import { createClient } from "@supabase/supabase-js";
+import supabase from "../liv/supabase.ts";
 import type { Track } from "../types/ApiDataTypes.ts";
-
-const supabase = createClient(
-	import.meta.env.VITE_SUPABASE_URL,
-	import.meta.env.VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY
-);
 
 // api 호출
 const fetchTracks = async (): Promise<Track[]> => {

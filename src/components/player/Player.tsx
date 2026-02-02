@@ -1,10 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
-import fetchTracks from "../../api/trackApi.ts";
-import { useTapModal } from "../../store/modalStore.ts";
+import { useNavigate } from "react-router-dom";
+import fetchTracks from "../../api/trackApi";
+import { useTapModal, MODAL_TYPES } from "../../store/modalStore";
 
 export default function Player() {
 	const selectedPanel = useTapModal((state) => state.selectedPanel);
 	const onPanelChange = useTapModal((state) => state.onPanelChange);
+	const navigate = useNavigate();
 
 	const { data, isLoading, error } = useQuery({
 		queryKey: ["jamendo_tracks"],
@@ -12,6 +14,11 @@ export default function Player() {
 	});
 
 	const currentTrack = data?.[0];
+
+	const handlePanelClick = (index: number) => {
+		onPanelChange(index);
+		navigate(`/${MODAL_TYPES[index]}`);
+	};
 
 	if (isLoading) return <p>로딩중</p>;
 	if (error) return <p>오류 발생: {error.message}</p>;
@@ -21,15 +28,14 @@ export default function Player() {
 		<div className="relative mb-10">
 			{/* 패널 버튼 섹션 */}
 			<section className="flex gap-5 mb-0 ml-12 relative z-0">
-				{[0, 1, 2, 3, 4].map((index) => (
+				{MODAL_TYPES.map((type, index) => (
 					<button
-						key={index}
-						onClick={() => onPanelChange(index)}
-						className={`w-10 h-6 rounded-t-lg transition-transform duration-300 ${
-							selectedPanel === index
+						key={type}
+						onClick={() => handlePanelClick(index)}
+						className={`w-10 h-6 rounded-t-lg transition-transform duration-300 ${selectedPanel === index
 								? "bg-linear-to-br from-yellow-400 to-orange-500 translate-y-2"
 								: "bg-gray-900"
-						}`}
+							}`}
 					/>
 				))}
 			</section>
@@ -61,3 +67,4 @@ export default function Player() {
 		</div>
 	);
 }
+
