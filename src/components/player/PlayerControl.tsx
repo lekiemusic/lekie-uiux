@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import fetchTracks from "../api/trackApi.ts";
+import fetchTracks from "../../api/trackApi.ts";
 
 export default function PlayerControl() {
 	const { data, isLoading, error } = useQuery({
@@ -12,7 +12,6 @@ export default function PlayerControl() {
 	if (isLoading) return <p>로딩중</p>;
 	if (error) return <p>오류 발생: {error.message}</p>;
 	if (!currentTrack) return <p>데이터 존재x</p>;
-
 
 	// 임시 재생 시간
 	const currentTime = currentTrack.duration;
