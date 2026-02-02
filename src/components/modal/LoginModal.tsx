@@ -1,9 +1,16 @@
 import { motion } from "motion/react";
 import { LogIn, Mail, Lock, User } from "lucide-react";
-import { useState } from "react";
+import { useOauth } from "../../hooks/mutations/auth.ts";
+import { useAuthStore } from "../../store/loginStore.ts";
 
 export function LoginModal() {
-	const [isSignUp, setIsSignUp] = useState(false);
+	const {isSignUp, setIsSignUp} = useAuthStore();
+
+	const { mutate: signInWithOauth } = useOauth();
+
+	const handleSignOauth = () => {
+		signInWithOauth("github");
+	};
 
 	return (
 		<div className="space-y-6">
@@ -20,7 +27,7 @@ export function LoginModal() {
 				</h3>
 				<p className="text-white/80">
 					{isSignUp
-						? "Player5 Music과 함께 시작하세요"
+						? "Lekie Music과 함께 시작하세요"
 						: "음악 세계로 들어가세요"}
 				</p>
 			</div>
@@ -116,6 +123,7 @@ export function LoginModal() {
 				</motion.button>
 
 				<motion.button
+					onClick={handleSignOauth}
 					className="w-full py-3 bg-white/10 backdrop-blur-sm text-white font-medium rounded-xl hover:bg-white/20 transition-all flex items-center justify-center gap-2"
 					whileHover={{ scale: 1.02 }}
 					whileTap={{ scale: 0.98 }}>

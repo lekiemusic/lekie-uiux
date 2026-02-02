@@ -38,7 +38,7 @@ export function ModalContainer({ children }: ModalContainerProps) {
 		<AnimatePresence>
 			{/* Backdrop */}
 			<motion.div
-				className="fixed inset-0 bg-black/60 z-60"
+				className="fixed inset-0 bg-black/60 z-40"
 				initial={{ opacity: 0 }}
 				animate={{ opacity: 1 }}
 				exit={{ opacity: 0 }}
@@ -47,7 +47,7 @@ export function ModalContainer({ children }: ModalContainerProps) {
 
 			{/* Modal */}
 			<motion.div
-				className="fixed inset-x-0 bottom-0 z-70 bg-gradient-to-br from-orange-500 to-amber-600 rounded-t-3xl shadow-2xl overflow-hidden mx-4"
+				className="fixed inset-x-0 bottom-0 z-50 bg-gradient-to-br from-orange-500 to-amber-600 rounded-t-3xl shadow-2xl overflow-hidden mx-4"
 				initial={{ y: "100%" }}
 				animate={{
 					y: 0,
