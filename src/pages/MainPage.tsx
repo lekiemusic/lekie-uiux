@@ -3,11 +3,16 @@ import PlayerControl from "../components/player/PlayerControl.tsx";
 import { LoginModal } from "../components/modal/LoginModal.tsx";
 import { useTapModal } from "../store/modalStore.ts";
 import { ModalContainer } from "../components/modal/ModalContainer.tsx";
+import { useAuthStore } from "../store/loginStore.ts";
+import { useSignOut } from "../hooks/mutations/auth.ts";
 
 export default function MainPage() {
-	const selectPanel = useTapModal((state) => state.selectedPanel);
+	const { selectedPanel, onPanelChange } = useTapModal();
+	const { session, isLoading } = useAuthStore();
+	const { mutate: signOut } = useSignOut();
+
 	const renderModalContent = () => {
-		switch (selectPanel) {
+		switch (selectedPanel) {
 			case 0:
 				return <LoginModal />;
 			case 1:
@@ -23,9 +28,41 @@ export default function MainPage() {
 		}
 	};
 
+	const handleLoginClick = () => {
+		onPanelChange(0); // Open the login modal
+	};
+
+	const handleLogoutClick = () => {
+		signOut();
+	};
+
 	return (
-		<div className="min-h-screen bg-gray-100 flex items-center justify-center p-8">
+		<div className="min-h-screen bg-white-900 text-white flex flex-col items-center justify-center p-8">
 			<div className="w-full max-w-xl">
+				<header className="flex justify-between items-center mb-4">
+					{!isLoading && (
+						<div>
+							{session ? (
+								<div className="flex items-center gap-4">
+									<p>{session.user.email}</p>
+									<button
+										onClick={handleLogoutClick}
+										className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
+									>
+										Logout
+									</button>
+								</div>
+							) : (
+								<button
+									onClick={handleLoginClick}
+									className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
+								>
+									Login
+								</button>
+							)}
+						</div>
+					)}
+				</header>
 				<Player />
 				<PlayerControl />
 				<ModalContainer>{renderModalContent()}</ModalContainer>

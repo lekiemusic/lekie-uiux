@@ -35,8 +35,6 @@ export const useTapModal = create(
 				}
 			},
 
-			// onModalExpanded: () => set((state) => ({isModalExpanded: !state.isModalExpanded})),
-
 			onClose: () => set({ selectedPanel: -1, isModalExpanded: false }),
 		})
 	)
