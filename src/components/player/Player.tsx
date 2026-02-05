@@ -1,19 +1,17 @@
-import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import fetchTracks from "../../api/trackApi";
 import { useTapModal, MODAL_TYPES } from "../../store/modalStore";
+import { useTrackStore } from "../../store/trackStore";
+import { useTracks } from "../../hooks/queries/useTracks";
 
 export default function Player() {
 	const selectedPanel = useTapModal((state) => state.selectedPanel);
 	const onPanelChange = useTapModal((state) => state.onPanelChange);
+	const currentIndex = useTrackStore((state) => state.currentIndex);
 	const navigate = useNavigate();
 
-	const { data, isLoading, error } = useQuery({
-		queryKey: ["jamendo_tracks"],
-		queryFn: fetchTracks,
-	});
+	const { data, isLoading, error } = useTracks();
 
-	const currentTrack = data?.[0];
+	const currentTrack = data?.[currentIndex];
 
 	const handlePanelClick = (index: number) => {
 		onPanelChange(index);
