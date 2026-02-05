@@ -1,23 +1,77 @@
-import { useQuery } from "@tanstack/react-query";
-import fetchTracks from "../../api/trackApi.ts";
+import { useState, useRef, useEffect } from "react";
+import { Play, Pause, SkipBack, SkipForward } from "lucide-react";
+import { useTrackStore } from "../../store/trackStore.ts";
+import { useTracks } from "../../hooks/queries/useTracks.ts";
 
 export default function PlayerControl() {
-	const { data, isLoading, error } = useQuery({
-		queryKey: ["jamendo_tracks"],
-		queryFn: fetchTracks,
-	});
+	const [isPlaying, setIsPlaying] = useState(false);
+	const [currentTime, setCurrentTime] = useState(0);
+	const { currentIndex, nextTrack, prevTrack } = useTrackStore();
+	const audioRef = useRef<HTMLAudioElement | null>(null);
 
-	const currentTrack = data?.[0];
+	const { data, isLoading, error } = useTracks();
+
+	const currentTrack = data?.[currentIndex];
+
+	useEffect(() => {
+		if (currentTrack?.audio_url) {
+			if (!audioRef.current) {
+				audioRef.current = new Audio(currentTrack.audio_url);
+			} else {
+				audioRef.current.src = currentTrack.audio_url;
+			}
+
+			const audio = audioRef.current;
+			// 곡이 변경되면 바로 재생 시작 (선택 사항, 여기서는 자동 재생 추가)
+			if (isPlaying) {
+				audio.play().catch(() => setIsPlaying(false));
+			}
+
+			const updateTime = () => setCurrentTime(audio.currentTime);
+			const handleEnd = () => {
+				if (data) nextTrack(data.length);
+			};
+
+			audio.addEventListener("timeupdate", updateTime);
+			audio.addEventListener("ended", handleEnd);
+
+			return () => {
+				audio.removeEventListener("timeupdate", updateTime);
+				audio.removeEventListener("ended", handleEnd);
+				audio.pause();
+			};
+		}
+	}, [currentTrack]); // isPlaying을 의존성에서 제외하여 곡 변경 시 자동 재생 유지 여부 결정
+
+	const handleTogglePlay = () => {
+		if (!audioRef.current) return;
+
+		if (isPlaying) {
+			audioRef.current.pause();
+		} else {
+			audioRef.current.play();
+		}
+		setIsPlaying(!isPlaying);
+	};
+
+	const handleNext = () => {
+		if (!data) return;
+		nextTrack(data.length);
+	};
+
+	const handlePrev = () => {
+		if (!data) return;
+		prevTrack(data.length);
+	};
 
 	if (isLoading) return <p>로딩중</p>;
 	if (error) return <p>오류 발생: {error.message}</p>;
 	if (!currentTrack) return <p>데이터 존재x</p>;
 
-	// 임시 재생 시간
-	const currentTime = currentTrack.duration;
+
+
 	const progress = (currentTime / currentTrack.duration) * 100;
 
-	// 초를 분:초 형식으로 변환
 	const formatTime = (seconds: number) => {
 		const mins = Math.floor(seconds / 60);
 		const secs = Math.floor(seconds % 60);
@@ -35,7 +89,7 @@ export default function PlayerControl() {
 				<div className="flex-1 relative">
 					<div className="w-full h-1 rounded-lg bg-gray-300">
 						<div
-							className="h-full bg-yellow-500 rounded-lg"
+							className="h-full bg-yellow-500 rounded-lg transition-all duration-100"
 							style={{ width: `${progress}%` }}
 						/>
 					</div>
@@ -49,24 +103,31 @@ export default function PlayerControl() {
 			{/* 컨트롤 버튼 */}
 			<section className="flex items-center justify-center gap-6">
 				{/* 이전 곡 버튼 */}
-				<button className="text-gray-400 hover:text-gray-600 active:scale-90 transition-all duration-200">
-					<svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
-						<path d="M16 18h2V6h-2zm-11-7l8.5-6v12z" />
-					</svg>
+				<button
+					onClick={handlePrev}
+					className="text-gray-400 hover:text-gray-600 active:scale-90 transition-all duration-200"
+				>
+					<SkipBack size={32} fill="currentColor" />
 				</button>
 
 				{/* 재생/일시정지 버튼 */}
-				<button className="w-16 h-16 rounded-full bg-linear-to-br from-yellow-400 to-yellow-500 shadow-lg flex items-center justify-center text-white hover:shadow-xl active:scale-95 transition-all duration-200">
-					<svg className="w-7 h-7 ml-1" fill="currentColor" viewBox="0 0 24 24">
-						<path d="M8 5v14l11-7z" />
-					</svg>
+				<button
+					onClick={handleTogglePlay}
+					className="w-16 h-16 rounded-full bg-linear-to-br from-yellow-400 to-yellow-500 shadow-lg flex items-center justify-center text-white hover:shadow-xl active:scale-95 transition-all duration-200"
+				>
+					{isPlaying ? (
+						<Pause size={28} fill="currentColor" />
+					) : (
+						<Play size={28} fill="currentColor" className="ml-1" />
+					)}
 				</button>
 
 				{/* 다음 곡 버튼 */}
-				<button className="text-gray-400 hover:text-gray-600 active:scale-90 transition-all duration-200">
-					<svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
-						<path d="M6 6h2v12H6zm13 6L11 6v12z" />
-					</svg>
+				<button
+					onClick={handleNext}
+					className="text-gray-400 hover:text-gray-600 active:scale-90 transition-all duration-200"
+				>
+					<SkipForward size={32} fill="currentColor" />
 				</button>
 			</section>
 		</div>

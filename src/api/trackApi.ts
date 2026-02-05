@@ -1,4 +1,4 @@
-import supabase from "../liv/supabase.ts";
+import supabase from "../lib/supabase.ts";
 import type { Track } from "../types/ApiDataTypes.ts";
 
 // api 호출

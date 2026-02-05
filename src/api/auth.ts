@@ -1,4 +1,4 @@
-import supabase from "../liv/supabase.ts";
+import supabase from "../lib/supabase.ts";
 import type { Provider } from "@supabase/supabase-js";
 
 export async function signOauth(provider: Provider) {
